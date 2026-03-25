@@ -241,7 +241,8 @@
       "drag": "Drag",
       "textScroll": "Text Scroll",
       "fireworks": "Fireworks",
-      "elementUI": "Component Overview"
+      "elementUI": "Component Overview",
+      "recording": "Recording Replay"
     },
     "template": {
       "title": "Template Center",
