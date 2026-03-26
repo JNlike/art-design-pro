@@ -50,6 +50,16 @@ export const widgetsRoutes: AppRouteRecord = {
       }
     },
     {
+      path: 'recording',
+      name: 'Recording',
+      component: '/widgets/recording',
+      meta: {
+        title: 'menus.widgets.recording',
+        icon: 'ri:video-line',
+        keepAlive: true
+      }
+    },
+    {
       path: 'count-to',
       name: 'CountTo',
       component: '/widgets/count-to',

@@ -241,7 +241,8 @@
       "drag": "拖拽",
       "textScroll": "文字滚动",
       "fireworks": "礼花",
-      "elementUI": "组件总览"
+      "elementUI": "组件总览",
+      "recording": "录像回放"
     },
     "template": {
       "title": "模板中心",
