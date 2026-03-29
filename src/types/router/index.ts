@@ -66,6 +66,8 @@ export interface RouteMeta extends Record<string | number | symbol, unknown> {
   authMark?: string
   /** 父级路径 */
   parentPath?: string
+  /** 打开新标签页*/
+  newPage?: boolean
 }
 
 /**

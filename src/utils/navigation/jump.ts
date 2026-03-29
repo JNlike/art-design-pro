@@ -31,9 +31,15 @@ export const openExternalLink = (link: string) => {
  */
 export const handleMenuJump = (item: AppRouteRecord, jumpToFirst: boolean = false) => {
   // 处理外部链接
-  const { link, isIframe } = item.meta
+  const { link, isIframe, isFullPage, newPage } = item.meta
   if (link && !isIframe) {
     return openExternalLink(link)
+  }
+
+  // 如果是全屏模式且需要在新标签页打开，则打开浏览器新标签页
+  if (isFullPage && newPage) {
+    const url = router.resolve(item.path).href
+    return window.open(url, '_blank')
   }
 
   // 如果不需要跳转到第一个子菜单，或者没有子菜单，直接跳转当前路径
