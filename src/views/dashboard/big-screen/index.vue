@@ -1,318 +1,372 @@
 <!-- 动物宏观行为监控平台 - 大屏页面 -->
+<!-- 图表：vue-data-ui | 装饰：datav-vue3 | 视频：vue3-video-play -->
 <template>
   <div class="big-screen">
-    <!-- 顶部标题栏 -->
-    <header class="bs-header">
-      <div class="bs-header__left">
-        <span class="bs-header__support">技术支持：Art Design Pro</span>
-      </div>
-      <div class="bs-header__center">
-        <div class="bs-header__title">动物宏观行为监控平台</div>
-        <div class="bs-header__subtitle">实时监测 / 视频分析 / 异常预警</div>
-      </div>
-      <div class="bs-header__right">
-        <div class="bs-header__time">{{ currentTime }}</div>
-        <div class="bs-header__date">{{ currentDate }}</div>
-        <div class="bs-status-dot bs-status-dot--online">
-          <span class="bs-status-dot__ring"></span>
-          系统在线
-        </div>
-      </div>
-    </header>
-
-    <!-- 主体区域 -->
-    <main class="bs-body">
-      <!-- 左侧分析区 -->
-      <section class="bs-left">
-        <!-- B1: 行为趋势分析 -->
-        <div class="bs-panel bs-panel--flex-col bs-left__top">
-          <div class="bs-panel__header">
-            <span class="bs-panel__title">异常行为动态趋势</span>
-            <span class="bs-badge bs-badge--blue">实时</span>
-          </div>
-          <div class="bs-panel__body">
-            <div class="bs-stat-row">
-              <div class="bs-stat-card">
-                <ArtCountTo
-                  class="bs-stat-card__value"
-                  :target="activeBehaviorCount"
-                  :duration="1500"
-                />
-                <div class="bs-stat-card__label">当前活跃</div>
-              </div>
-              <div class="bs-stat-card bs-stat-card--warn">
-                <ArtCountTo class="bs-stat-card__value" :target="anomalyCount" :duration="1500" />
-                <div class="bs-stat-card__label">异常数量</div>
-              </div>
-              <div class="bs-stat-card bs-stat-card--danger">
-                <ArtCountTo class="bs-stat-card__value" :target="alertCount" :duration="1500" />
-                <div class="bs-stat-card__label">告警数量</div>
-              </div>
-            </div>
-            <ArtLineChart
-              height="120px"
-              :data="trendChartData"
-              :xAxisData="trendXAxis"
-              :showAreaColor="true"
-              :smooth="true"
-              :showLegend="true"
-              legendPosition="bottom"
-              :colors="['#00c8ff', '#ff4d4d', '#ffd700']"
-            />
-          </div>
-          <!-- 行为类型表格 -->
-          <div class="bs-table">
-            <div class="bs-table__head">
-              <span>序号</span>
-              <span>行为类型</span>
-              <span>发生次数</span>
-              <span>状态</span>
-            </div>
-            <div
-              v-for="(item, idx) in behaviorList"
-              :key="idx"
-              class="bs-table__row"
-              :class="{ 'bs-table__row--warn': item.status === '异常' }"
-            >
-              <span class="bs-table__idx">{{ idx + 1 }}</span>
-              <span>{{ item.type }}</span>
-              <span class="bs-table__count">{{ item.count }}</span>
-              <span
-                class="bs-badge"
-                :class="item.status === '异常' ? 'bs-badge--danger' : 'bs-badge--success'"
-                >{{ item.status }}</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <!-- B2: 行为统计分布 -->
-        <div class="bs-panel bs-panel--flex-col bs-left__bottom">
-          <div class="bs-panel__header">
-            <span class="bs-panel__title">行为统计分布</span>
-          </div>
-          <div class="bs-panel__body bs-panel__body--row">
-            <div class="bs-chart-half">
-              <div class="bs-chart-label">按时段统计</div>
-              <ArtBarChart
-                height="120px"
-                :data="barChartData"
-                :xAxisData="barXAxis"
-                :colors="['#00c8ff']"
-                barWidth="40%"
-              />
-            </div>
-            <div class="bs-chart-half">
-              <div class="bs-chart-label">行为类型占比</div>
-              <ArtRingChart
-                height="120px"
-                :data="ringChartData"
-                :showLegend="true"
-                legendPosition="right"
-                centerText="占比"
-                :colors="['#00c8ff', '#ffd700', '#ff4d4d', '#52c41a', '#a855f7']"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 中间视频主区域 -->
-      <section class="bs-center">
-        <!-- C1: 视频标题栏 -->
-        <div class="bs-video-header">
-          <div class="bs-video-header__info">
-            <span class="bs-video-header__cam">{{ activeCam.name }}</span>
-            <span class="bs-badge bs-badge--live">
-              <span class="bs-live-dot"></span>
-              {{ activeCam.status }}
-            </span>
-            <span class="bs-video-header__id">ID: {{ activeCam.id }}</span>
-          </div>
-          <div class="bs-video-header__loc">{{ activeCam.location }}</div>
-        </div>
-
-        <!-- C2: 视频播放区 -->
-        <div class="bs-video-wrap">
-          <div class="bs-video-corner bs-video-corner--tl"></div>
-          <div class="bs-video-corner bs-video-corner--tr"></div>
-          <div class="bs-video-corner bs-video-corner--bl"></div>
-          <div class="bs-video-corner bs-video-corner--br"></div>
-          <ArtVideoPlayer
-            :playerId="`big-screen-player-${activeCam.id}`"
-            :videoUrl="activeCam.url"
-            posterUrl=""
-            :autoplay="false"
-            :volume="0.5"
-            :key="activeCam.id"
+    <!-- 整页外层科技边框：datav-vue3 BorderBox11 -->
+    <BorderBox11
+      class="bs-border-outer"
+      :color="['#003366', '#00c8ff']"
+      backgroundColor="transparent"
+    >
+      <!-- 顶部标题栏 -->
+      <header class="bs-header">
+        <div class="bs-header__left">
+          <span class="bs-header__support">技术支持：Art Design Pro</span>
+          <!-- datav-vue3 Decoration6 标题栏左侧装饰线 -->
+          <Decoration6
+            class="bs-header__deco"
+            :color="['#003366', '#00c8ff']"
+            style="width: 120px; height: 30px"
           />
         </div>
-
-        <!-- C3: 摄像头缩略图切换 -->
-        <div class="bs-cam-list">
-          <div
-            v-for="cam in camList"
-            :key="cam.id"
-            class="bs-cam-item"
-            :class="{ 'bs-cam-item--active': cam.id === activeCam.id }"
-            @click="activeCam = cam"
-          >
-            <div class="bs-cam-item__thumb">
-              <ArtSvgIcon icon="ri:vidicon-line" class="bs-cam-item__icon" />
-              <span
-                class="bs-cam-item__status"
-                :class="cam.online ? 'bs-cam-item__status--online' : 'bs-cam-item__status--offline'"
-              ></span>
-            </div>
-            <div class="bs-cam-item__name">{{ cam.name }}</div>
+        <div class="bs-header__center">
+          <div class="bs-header__title">动物宏观行为监控平台</div>
+          <div class="bs-header__subtitle">实时监测 / 视频分析 / 异常预警</div>
+        </div>
+        <div class="bs-header__right">
+          <!-- datav-vue3 Decoration6 标题栏右侧装饰线 -->
+          <Decoration6
+            class="bs-header__deco bs-header__deco--right"
+            :color="['#00c8ff', '#003366']"
+            style="width: 120px; height: 30px"
+          />
+          <div class="bs-header__time">{{ currentTime }}</div>
+          <div class="bs-header__date">{{ currentDate }}</div>
+          <div class="bs-status-dot bs-status-dot--online">
+            <span class="bs-status-dot__ring"></span>
+            系统在线
           </div>
         </div>
-      </section>
+      </header>
 
-      <!-- 右侧状态区 -->
-      <section class="bs-right">
-        <!-- D1: 边缘设备信息 -->
-        <div class="bs-panel bs-panel--flex-col bs-right__top">
-          <div class="bs-panel__header">
-            <span class="bs-panel__title">边缘设备信息</span>
-            <span class="bs-device-total"
-              >共 <b>{{ deviceStats.total }}</b> 台</span
-            >
-          </div>
-          <div class="bs-panel__body bs-panel__body--row">
-            <ArtRingChart
-              height="100px"
-              :data="deviceRingData"
-              centerText="在线率"
-              :showLegend="false"
-              :colors="['#52c41a', '#ff4d4d', '#ffd700']"
+      <!-- 主体区域 -->
+      <main class="bs-body">
+        <!-- 左侧分析区 -->
+        <section class="bs-left">
+          <!-- B1: 行为趋势分析 -->
+          <BorderBox8
+            class="bs-panel bs-panel--flex-col bs-left__top"
+            :color="['#003366', '#00c8ff']"
+          >
+            <div class="bs-panel__header">
+              <span class="bs-panel__title">异常行为动态趋势</span>
+              <span class="bs-badge bs-badge--blue">实时</span>
+            </div>
+            <div class="bs-panel__body">
+              <div class="bs-stat-row">
+                <div class="bs-stat-card">
+                  <ArtCountTo
+                    class="bs-stat-card__value"
+                    :target="activeBehaviorCount"
+                    :duration="1500"
+                  />
+                  <div class="bs-stat-card__label">当前活跃</div>
+                </div>
+                <div class="bs-stat-card bs-stat-card--warn">
+                  <ArtCountTo
+                    class="bs-stat-card__value"
+                    :target="anomalyCount"
+                    :duration="1500"
+                  />
+                  <div class="bs-stat-card__label">异常数量</div>
+                </div>
+                <div class="bs-stat-card bs-stat-card--danger">
+                  <ArtCountTo
+                    class="bs-stat-card__value"
+                    :target="alertCount"
+                    :duration="1500"
+                  />
+                  <div class="bs-stat-card__label">告警数量</div>
+                </div>
+              </div>
+              <!-- vue-data-ui VueUiXy 折线图 -->
+              <VueUiXy :dataset="trendDataset" :config="trendConfig" />
+            </div>
+            <!-- 行为类型表格 -->
+            <div class="bs-table">
+              <div class="bs-table__head">
+                <span>序号</span>
+                <span>行为类型</span>
+                <span>发生次数</span>
+                <span>状态</span>
+              </div>
+              <div
+                v-for="(item, idx) in behaviorList"
+                :key="idx"
+                class="bs-table__row"
+                :class="{ 'bs-table__row--warn': item.status === '异常' }"
+              >
+                <span class="bs-table__idx">{{ idx + 1 }}</span>
+                <span>{{ item.type }}</span>
+                <span class="bs-table__count">{{ item.count }}</span>
+                <span
+                  class="bs-badge"
+                  :class="item.status === '异常' ? 'bs-badge--danger' : 'bs-badge--success'"
+                  >{{ item.status }}</span
+                >
+              </div>
+            </div>
+          </BorderBox8>
+
+          <!-- B2: 行为统计分布 -->
+          <BorderBox8
+            class="bs-panel bs-panel--flex-col bs-left__bottom"
+            :color="['#003366', '#00c8ff']"
+          >
+            <div class="bs-panel__header">
+              <span class="bs-panel__title">行为统计分布</span>
+            </div>
+            <div class="bs-panel__body bs-panel__body--row">
+              <div class="bs-chart-half">
+                <div class="bs-chart-label">按时段统计</div>
+                <!-- vue-data-ui VueUiXy 柱状图 -->
+                <VueUiXy :dataset="barDataset" :config="barConfig" />
+              </div>
+              <div class="bs-chart-half">
+                <div class="bs-chart-label">行为类型占比</div>
+                <!-- vue-data-ui VueUiDonut 环形图 -->
+                <VueUiDonut :dataset="ringDataset" :config="donutConfig" />
+              </div>
+            </div>
+          </BorderBox8>
+        </section>
+
+        <!-- 中间视频主区域 -->
+        <section class="bs-center">
+          <!-- C1: 视频标题栏 -->
+          <div class="bs-video-header">
+            <!-- datav-vue3 Decoration10 左侧装饰 -->
+            <Decoration10
+              class="bs-video-deco"
+              :color="['#00c8ff', '#003366']"
+              style="width: 80px; height: 30px"
             />
-            <div class="bs-device-stats">
-              <div v-for="s in deviceStatList" :key="s.label" class="bs-device-stat-item">
-                <span class="bs-device-stat-item__dot" :style="{ background: s.color }"></span>
-                <span class="bs-device-stat-item__label">{{ s.label }}</span>
-                <span class="bs-device-stat-item__value">{{ s.value }}</span>
+            <div class="bs-video-header__info">
+              <span class="bs-video-header__cam">{{ activeCam.name }}</span>
+              <span class="bs-badge bs-badge--live">
+                <span class="bs-live-dot"></span>
+                {{ activeCam.status }}
+              </span>
+              <span class="bs-video-header__id">ID: {{ activeCam.id }}</span>
+            </div>
+            <div class="bs-video-header__loc">{{ activeCam.location }}</div>
+            <!-- datav-vue3 Decoration10 右侧装饰（镜像） -->
+            <Decoration10
+              class="bs-video-deco"
+              :color="['#003366', '#00c8ff']"
+              style="width: 80px; height: 30px; transform: scaleX(-1)"
+            />
+          </div>
+
+          <!-- C2: 视频播放区 - vue3-video-play 包裹在 datav-vue3 BorderBox12 中 -->
+          <BorderBox12
+            class="bs-video-wrap"
+            :color="['#00c8ff', '#003366']"
+            backgroundColor="transparent"
+          >
+            <vue3-video-play
+              :key="activeCam.id"
+              :src="activeCam.url"
+              :title="activeCam.name"
+              width="100%"
+              height="100%"
+              :autoPlay="false"
+              :loop="false"
+              :muted="false"
+              :volume="0.3"
+              color="#00c8ff"
+              :control="true"
+            />
+          </BorderBox12>
+
+          <!-- C3: 摄像头缩略图切换 -->
+          <div class="bs-cam-list">
+            <div
+              v-for="cam in camList"
+              :key="cam.id"
+              class="bs-cam-item"
+              :class="{ 'bs-cam-item--active': cam.id === activeCam.id }"
+              @click="activeCam = cam"
+            >
+              <div class="bs-cam-item__thumb">
+                <ArtSvgIcon icon="ri:vidicon-line" class="bs-cam-item__icon" />
+                <span
+                  class="bs-cam-item__status"
+                  :class="
+                    cam.online ? 'bs-cam-item__status--online' : 'bs-cam-item__status--offline'
+                  "
+                ></span>
+              </div>
+              <div class="bs-cam-item__name">{{ cam.name }}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右侧状态区 -->
+        <section class="bs-right">
+          <!-- D1: 边缘设备信息 -->
+          <BorderBox8
+            class="bs-panel bs-panel--flex-col bs-right__top"
+            :color="['#003366', '#00c8ff']"
+          >
+            <div class="bs-panel__header">
+              <span class="bs-panel__title">边缘设备信息</span>
+              <span class="bs-device-total"
+                >共 <b>{{ deviceStats.total }}</b> 台</span
+              >
+            </div>
+            <div class="bs-panel__body bs-panel__body--row">
+              <!-- vue-data-ui VueUiDonut 环形图（在线率） -->
+              <div class="bs-device-ring">
+                <VueUiDonut :dataset="deviceRingDataset" :config="deviceDonutConfig" />
+              </div>
+              <div class="bs-device-stats">
+                <div v-for="s in deviceStatList" :key="s.label" class="bs-device-stat-item">
+                  <span class="bs-device-stat-item__dot" :style="{ background: s.color }"></span>
+                  <span class="bs-device-stat-item__label">{{ s.label }}</span>
+                  <span class="bs-device-stat-item__value">{{ s.value }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="bs-progress-list">
+              <div v-for="prog in deviceProgresses" :key="prog.label" class="bs-progress-item">
+                <div class="bs-progress-item__header">
+                  <span>{{ prog.label }}</span>
+                  <span>{{ prog.value }}%</span>
+                </div>
+                <div class="bs-progress-item__bar">
+                  <div
+                    class="bs-progress-item__fill"
+                    :style="{ width: prog.value + '%', background: prog.color }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </BorderBox8>
+
+          <!-- D2: 异常提示 -->
+          <BorderBox8
+            class="bs-panel bs-panel--flex-col bs-right__mid"
+            :color="['#331000', '#ff4d4d']"
+          >
+            <div class="bs-panel__header">
+              <span class="bs-panel__title">实时异常提示</span>
+              <span class="bs-badge bs-badge--danger">{{ alertList.length }} 条</span>
+            </div>
+            <div class="bs-alert-list">
+              <div
+                v-for="(alert, idx) in alertList"
+                :key="idx"
+                class="bs-alert-item"
+                :class="`bs-alert-item--${alert.level}`"
+              >
+                <span class="bs-alert-item__time">{{ alert.time }}</span>
+                <span class="bs-alert-item__device">{{ alert.device }}</span>
+                <span class="bs-alert-item__msg">{{ alert.msg }}</span>
+              </div>
+            </div>
+          </BorderBox8>
+
+          <!-- D3: 异常排行 -->
+          <BorderBox8
+            class="bs-panel bs-panel--flex-col bs-right__bottom"
+            :color="['#003366', '#00c8ff']"
+          >
+            <div class="bs-panel__header">
+              <span class="bs-panel__title">异常排行 TOP5</span>
+            </div>
+            <div class="bs-panel__body">
+              <!-- vue-data-ui VueUiHorizontalBar 水平条形图 -->
+              <VueUiHorizontalBar :dataset="rankingDataset" :config="hbarConfig" />
+            </div>
+          </BorderBox8>
+        </section>
+      </main>
+
+      <!-- 底部区域 -->
+      <footer class="bs-footer">
+        <!-- 实时告警列表 -->
+        <BorderBox3
+          class="bs-panel bs-footer__block"
+          :color="['#003366', '#00c8ff']"
+        >
+          <div class="bs-panel__header">
+            <span class="bs-panel__title">实时告警</span>
+          </div>
+          <div class="bs-scroll-list">
+            <div
+              v-for="(item, idx) in realtimeAlerts"
+              :key="idx"
+              class="bs-scroll-list__item"
+              :class="`bs-scroll-list__item--${item.level}`"
+            >
+              <span class="bs-scroll-list__level-dot"></span>
+              <span class="bs-scroll-list__time">{{ item.time }}</span>
+              <span class="bs-scroll-list__target">{{ item.target }}</span>
+              <span class="bs-scroll-list__content">{{ item.content }}</span>
+            </div>
+          </div>
+        </BorderBox3>
+
+        <!-- 今日统计汇总 -->
+        <BorderBox3
+          class="bs-panel bs-footer__block"
+          :color="['#003366', '#00c8ff']"
+        >
+          <div class="bs-panel__header">
+            <span class="bs-panel__title">今日统计汇总</span>
+          </div>
+          <div class="bs-today-stats">
+            <div v-for="stat in todayStats" :key="stat.label" class="bs-today-stat">
+              <ArtCountTo class="bs-today-stat__value" :target="stat.value" :duration="2000" />
+              <div class="bs-today-stat__label">{{ stat.label }}</div>
+              <div class="bs-today-stat__sub" :class="`bs-today-stat__sub--${stat.type}`">
+                {{ stat.sub }}
               </div>
             </div>
           </div>
-          <div class="bs-progress-list">
-            <div v-for="prog in deviceProgresses" :key="prog.label" class="bs-progress-item">
-              <div class="bs-progress-item__header">
-                <span>{{ prog.label }}</span>
-                <span>{{ prog.value }}%</span>
+        </BorderBox3>
+
+        <!-- 系统运行状态 -->
+        <BorderBox3
+          class="bs-panel bs-footer__block"
+          :color="['#003366', '#00c8ff']"
+        >
+          <div class="bs-panel__header">
+            <span class="bs-panel__title">系统运行状态</span>
+          </div>
+          <div class="bs-sys-stats">
+            <div v-for="sys in sysStats" :key="sys.label" class="bs-sys-stat">
+              <div class="bs-sys-stat__header">
+                <span class="bs-sys-indicator" :class="`bs-sys-indicator--${sys.level}`"></span>
+                <span class="bs-sys-stat__label">{{ sys.label }}</span>
+                <span class="bs-sys-stat__value">{{ sys.value }}</span>
               </div>
               <div class="bs-progress-item__bar">
                 <div
                   class="bs-progress-item__fill"
-                  :style="{ width: prog.value + '%', background: prog.color }"
+                  :style="{ width: sys.percent + '%', background: sys.color }"
                 ></div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- D2: 异常提示 -->
-        <div class="bs-panel bs-panel--flex-col bs-right__mid">
-          <div class="bs-panel__header">
-            <span class="bs-panel__title">实时异常提示</span>
-            <span class="bs-badge bs-badge--danger">{{ alertList.length }} 条</span>
-          </div>
-          <div class="bs-alert-list">
-            <div
-              v-for="(alert, idx) in alertList"
-              :key="idx"
-              class="bs-alert-item"
-              :class="`bs-alert-item--${alert.level}`"
-            >
-              <span class="bs-alert-item__time">{{ alert.time }}</span>
-              <span class="bs-alert-item__device">{{ alert.device }}</span>
-              <span class="bs-alert-item__msg">{{ alert.msg }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- D3: 异常排行 -->
-        <div class="bs-panel bs-panel--flex-col bs-right__bottom">
-          <div class="bs-panel__header">
-            <span class="bs-panel__title">异常排行 TOP5</span>
-          </div>
-          <div class="bs-panel__body">
-            <ArtHBarChart
-              height="130px"
-              :data="rankingData"
-              :xAxisData="rankingLabels"
-              :colors="['#ff4d4d']"
-              barWidth="40%"
-            />
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- 底部区域 -->
-    <footer class="bs-footer">
-      <!-- 实时告警列表 -->
-      <div class="bs-panel bs-footer__block">
-        <div class="bs-panel__header">
-          <span class="bs-panel__title">实时告警</span>
-        </div>
-        <div class="bs-scroll-list">
-          <div
-            v-for="(item, idx) in realtimeAlerts"
-            :key="idx"
-            class="bs-scroll-list__item"
-            :class="`bs-scroll-list__item--${item.level}`"
-          >
-            <span class="bs-scroll-list__level-dot"></span>
-            <span class="bs-scroll-list__time">{{ item.time }}</span>
-            <span class="bs-scroll-list__target">{{ item.target }}</span>
-            <span class="bs-scroll-list__content">{{ item.content }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 今日统计汇总 -->
-      <div class="bs-panel bs-footer__block">
-        <div class="bs-panel__header">
-          <span class="bs-panel__title">今日统计汇总</span>
-        </div>
-        <div class="bs-today-stats">
-          <div v-for="stat in todayStats" :key="stat.label" class="bs-today-stat">
-            <ArtCountTo class="bs-today-stat__value" :target="stat.value" :duration="2000" />
-            <div class="bs-today-stat__label">{{ stat.label }}</div>
-            <div class="bs-today-stat__sub" :class="`bs-today-stat__sub--${stat.type}`">
-              {{ stat.sub }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 系统运行状态 -->
-      <div class="bs-panel bs-footer__block">
-        <div class="bs-panel__header">
-          <span class="bs-panel__title">系统运行状态</span>
-        </div>
-        <div class="bs-sys-stats">
-          <div v-for="sys in sysStats" :key="sys.label" class="bs-sys-stat">
-            <div class="bs-sys-stat__header">
-              <span class="bs-sys-indicator" :class="`bs-sys-indicator--${sys.level}`"></span>
-              <span class="bs-sys-stat__label">{{ sys.label }}</span>
-              <span class="bs-sys-stat__value">{{ sys.value }}</span>
-            </div>
-            <div class="bs-progress-item__bar">
-              <div
-                class="bs-progress-item__fill"
-                :style="{ width: sys.percent + '%', background: sys.color }"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+        </BorderBox3>
+      </footer>
+    </BorderBox11>
   </div>
 </template>
 
 <script setup lang="ts">
+  // vue-data-ui：数据图表组件
+  import { VueUiXy, VueUiDonut, VueUiHorizontalBar } from 'vue-data-ui'
+  import type { VueUiXyDatasetItem, VueUiXyConfig } from 'vue-data-ui'
+  import 'vue-data-ui/style.css'
+  // vue3-video-play：视频播放控件
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error – vue3-video-play has no type declarations
+  import { videoPlay as Vue3VideoPlay } from 'vue3-video-play/dist/index.mjs'
+  import 'vue3-video-play/dist/style.css'
+
   defineOptions({ name: 'BigScreen' })
 
   // ──────────────── 时间 ────────────────
@@ -339,13 +393,53 @@
   const anomalyCount = ref(23)
   const alertCount = ref(7)
 
-  // ──────────────── 行为趋势折线图 ────────────────
-  const trendXAxis = ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00']
-  const trendChartData = ref([
-    { name: '正常行为', data: [45, 52, 68, 74, 85, 79, 92] },
-    { name: '异常行为', data: [12, 18, 9, 23, 15, 28, 19] },
-    { name: '告警事件', data: [3, 5, 2, 8, 4, 9, 6] }
+  // ──────────────── vue-data-ui: VueUiXy 折线图数据 ────────────────
+  const trendDataset = ref<VueUiXyDatasetItem[]>([
+    {
+      name: '正常行为',
+      type: 'line',
+      series: [45, 52, 68, 74, 85, 79, 92],
+      color: '#00c8ff',
+      smooth: true
+    },
+    {
+      name: '异常行为',
+      type: 'line',
+      series: [12, 18, 9, 23, 15, 28, 19],
+      color: '#ff4d4d',
+      smooth: true
+    },
+    {
+      name: '告警事件',
+      type: 'line',
+      series: [3, 5, 2, 8, 4, 9, 6],
+      color: '#ffd700',
+      smooth: true
+    }
   ])
+  const trendConfig: VueUiXyConfig = {
+    chart: {
+      backgroundColor: 'transparent',
+      color: '#d0e8ff',
+      height: 130,
+      padding: { top: 12, left: 32, right: 12, bottom: 28 },
+      grid: {
+        stroke: 'rgba(0,200,255,0.12)',
+        labels: {
+          show: true,
+          color: '#d0e8ff',
+          fontSize: 9,
+          xAxisLabels: {
+            values: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+            show: true,
+            color: '#d0e8ff',
+            fontSize: 9
+          }
+        }
+      },
+      legend: { show: false }
+    }
+  }
 
   // ──────────────── 行为类型表 ────────────────
   const behaviorList = ref([
@@ -356,18 +450,59 @@
     { type: '静止不动', count: 25, status: '正常' }
   ])
 
-  // ──────────────── 行为统计柱状图 ────────────────
-  const barXAxis = ['00-04', '04-08', '08-12', '12-16', '16-20', '20-24']
-  const barChartData = ref([32, 28, 75, 68, 82, 45])
-
-  // ──────────────── 行为类型环形图 ────────────────
-  const ringChartData = ref([
-    { name: '觅食', value: 35 },
-    { name: '聚集', value: 28 },
-    { name: '逃跑', value: 12 },
-    { name: '打架', value: 8 },
-    { name: '静止', value: 17 }
+  // ──────────────── vue-data-ui: VueUiXy 柱状图数据 ────────────────
+  const barDataset = ref<VueUiXyDatasetItem[]>([
+    { name: '行为数', type: 'bar', series: [32, 28, 75, 68, 82, 45], color: '#00c8ff' }
   ])
+  const barConfig: VueUiXyConfig = {
+    chart: {
+      backgroundColor: 'transparent',
+      color: '#d0e8ff',
+      height: 120,
+      padding: { top: 12, left: 32, right: 12, bottom: 28 },
+      grid: {
+        stroke: 'rgba(0,200,255,0.12)',
+        labels: {
+          show: true,
+          color: '#d0e8ff',
+          fontSize: 9,
+          xAxisLabels: {
+            values: ['00-04', '04-08', '08-12', '12-16', '16-20', '20-24'],
+            show: true,
+            color: '#d0e8ff',
+            fontSize: 9
+          }
+        }
+      },
+      legend: { show: false }
+    }
+  }
+
+  // ──────────────── vue-data-ui: VueUiDonut 行为类型环形图 ────────────────
+  const ringDataset = ref([
+    { name: '觅食', color: '#00c8ff', values: [35] },
+    { name: '聚集', color: '#ffd700', values: [28] },
+    { name: '逃跑', color: '#ff4d4d', values: [12] },
+    { name: '打架', color: '#a855f7', values: [8] },
+    { name: '静止', color: '#52c41a', values: [17] }
+  ])
+  const donutConfig = {
+    style: {
+      chart: {
+        backgroundColor: 'transparent',
+        color: '#d0e8ff',
+        height: 120,
+        layout: {
+          labels: { dataLabels: { show: false } }
+        },
+        legend: {
+          backgroundColor: 'transparent',
+          color: '#d0e8ff',
+          fontSize: 9
+        }
+      }
+    }
+  }
 
   // ──────────────── 摄像头列表 ────────────────
   interface CamItem {
@@ -426,11 +561,26 @@
 
   // ──────────────── 边缘设备统计 ────────────────
   const deviceStats = ref({ total: 24, online: 20, offline: 3, warning: 1 })
-  const deviceRingData = computed(() => [
-    { name: '在线', value: deviceStats.value.online },
-    { name: '离线', value: deviceStats.value.offline },
-    { name: '告警', value: deviceStats.value.warning }
+
+  // vue-data-ui: VueUiDonut 设备在线率环形图
+  const deviceRingDataset = computed(() => [
+    { name: '在线', color: '#52c41a', values: [deviceStats.value.online] },
+    { name: '离线', color: '#ff4d4d', values: [deviceStats.value.offline] },
+    { name: '告警', color: '#ffd700', values: [deviceStats.value.warning] }
   ])
+  const deviceDonutConfig = {
+    style: {
+      chart: {
+        backgroundColor: 'transparent',
+        color: '#d0e8ff',
+        height: 100,
+        layout: {
+          labels: { dataLabels: { show: false } }
+        },
+        legend: { show: false }
+      }
+    }
+  }
   const deviceStatList = computed(() => [
     { label: '在线设备', value: deviceStats.value.online, color: '#52c41a' },
     { label: '离线设备', value: deviceStats.value.offline, color: '#ff4d4d' },
@@ -452,9 +602,30 @@
     { time: '16:58:20', device: 'EDGE-03', msg: '存储空间不足 20%', level: 'low' }
   ])
 
-  // ──────────────── 异常排行 ────────────────
-  const rankingLabels = ['3号区域', '1号区域', '2号区域', '5号区域', '4号区域']
-  const rankingData = ref([48, 35, 28, 17, 12])
+  // ──────────────── vue-data-ui: VueUiHorizontalBar 异常排行 ────────────────
+  const rankingDataset = ref([
+    { name: '3号区域', value: 48, color: '#ff4d4d' },
+    { name: '1号区域', value: 35, color: '#ff7a45' },
+    { name: '2号区域', value: 28, color: '#ffa940' },
+    { name: '5号区域', value: 17, color: '#ffc53d' },
+    { name: '4号区域', value: 12, color: '#ffd700' }
+  ])
+  const hbarConfig = {
+    style: {
+      chart: {
+        backgroundColor: 'transparent',
+        color: '#d0e8ff',
+        height: 130,
+        padding: { top: 8, left: 60, right: 16, bottom: 8 },
+        labels: { color: '#d0e8ff', fontSize: 10 },
+        bars: {
+          borderRadius: 2,
+          dataLabels: { color: '#d0e8ff', fontSize: 10 }
+        }
+      },
+      legend: { show: false }
+    }
+  }
 
   // ──────────────── 底部实时告警 ────────────────
   const realtimeAlerts = ref([
@@ -514,6 +685,14 @@
     user-select: none;
   }
 
+  /* datav-vue3 外层边框容器 */
+  .bs-border-outer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+
   /* ─────── 顶部标题栏 ─────── */
   .bs-header {
     display: flex;
@@ -534,11 +713,18 @@
 
   .bs-header__left {
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .bs-header__support {
     font-size: 11px;
     color: var(--bs-text-muted);
+  }
+
+  .bs-header__deco {
+    opacity: 0.8;
   }
 
   .bs-header__center {
@@ -671,31 +857,13 @@
 
   /* ─────── 面板通用 ─────── */
   .bs-panel {
-    background: var(--bs-panel-bg);
-    border: 1px solid var(--bs-border);
-    border-radius: 4px;
-    padding: 8px 10px;
-    box-shadow:
-      inset 0 0 20px rgba(0, 200, 255, 0.03),
-      0 0 12px rgba(0, 0, 0, 0.4);
     position: relative;
     overflow: hidden;
-
-    /* 顶部发光线 */
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--bs-primary), transparent);
-      opacity: 0.7;
-    }
 
     &--flex-col {
       display: flex;
       flex-direction: column;
+      padding: 10px 12px;
     }
   }
 
@@ -862,6 +1030,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    overflow: hidden;
   }
 
   .bs-chart-label {
@@ -881,12 +1050,19 @@
     border-radius: 3px;
     background: var(--bs-panel-bg);
     flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .bs-video-deco {
+    opacity: 0.8;
+    flex-shrink: 0;
   }
 
   .bs-video-header__info {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex: 1;
   }
 
   .bs-video-header__cam {
@@ -905,52 +1081,17 @@
     color: var(--bs-text-muted);
   }
 
+  /* datav-vue3 BorderBox12 视频外框 */
   .bs-video-wrap {
     flex: 1;
     min-height: 0;
-    position: relative;
-    border: 1px solid var(--bs-border-glow);
-    border-radius: 3px;
     overflow: hidden;
     background: #000;
 
-    :deep(.xgplayer) {
+    /* vue3-video-play 播放器内部样式适配 */
+    :deep(.d-player-wrap) {
       width: 100% !important;
       height: 100% !important;
-    }
-  }
-
-  /* 发光边角 */
-  .bs-video-corner {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    z-index: 10;
-    pointer-events: none;
-
-    &--tl {
-      top: 0;
-      left: 0;
-      border-top: 2px solid var(--bs-primary);
-      border-left: 2px solid var(--bs-primary);
-    }
-    &--tr {
-      top: 0;
-      right: 0;
-      border-top: 2px solid var(--bs-primary);
-      border-right: 2px solid var(--bs-primary);
-    }
-    &--bl {
-      bottom: 0;
-      left: 0;
-      border-bottom: 2px solid var(--bs-primary);
-      border-left: 2px solid var(--bs-primary);
-    }
-    &--br {
-      bottom: 0;
-      right: 0;
-      border-bottom: 2px solid var(--bs-primary);
-      border-right: 2px solid var(--bs-primary);
     }
   }
 
@@ -1047,6 +1188,12 @@
     }
   }
 
+  .bs-device-ring {
+    width: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
   .bs-device-stats {
     flex: 1;
     display: flex;
@@ -1100,7 +1247,7 @@
 
     &__bar {
       height: 4px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 200, 255, 0.1);
       border-radius: 2px;
       overflow: hidden;
     }
@@ -1108,18 +1255,18 @@
     &__fill {
       height: 100%;
       border-radius: 2px;
-      transition: width 0.6s ease;
+      transition: width 1s ease;
     }
   }
 
-  /* ─────── 异常告警列表 ─────── */
+  /* ─────── 告警列表 ─────── */
   .bs-alert-list {
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-height: 0;
+    gap: 5px;
+    padding-right: 2px;
 
     &::-webkit-scrollbar {
       width: 3px;
@@ -1127,7 +1274,6 @@
 
     &::-webkit-scrollbar-thumb {
       background: var(--bs-border-glow);
-      border-radius: 3px;
     }
   }
 
@@ -1135,61 +1281,58 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    font-size: 10px;
     padding: 4px 6px;
     border-radius: 3px;
-    font-size: 10px;
     border-left: 2px solid;
 
     &--high {
-      background: rgba(255, 77, 77, 0.06);
       border-color: var(--bs-danger);
+      background: rgba(255, 77, 77, 0.06);
     }
 
     &--mid {
-      background: rgba(255, 215, 0, 0.05);
       border-color: var(--bs-warn);
+      background: rgba(255, 215, 0, 0.04);
     }
 
     &--low {
-      background: rgba(0, 200, 255, 0.04);
-      border-color: var(--bs-primary);
+      border-color: var(--bs-success);
+      background: rgba(82, 196, 26, 0.04);
     }
 
     &__time {
       color: var(--bs-text-muted);
-      font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
 
     &__device {
       color: var(--bs-primary);
+      font-weight: 600;
       flex-shrink: 0;
-      font-weight: 500;
     }
 
     &__msg {
-      flex: 1;
       color: var(--bs-text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      flex: 1;
     }
   }
 
   /* ─────── 底部 ─────── */
   .bs-footer {
     display: flex;
-    gap: 10px;
-    padding: 0 10px 8px;
+    gap: 8px;
     height: 130px;
+    padding: 0 10px 8px;
     flex-shrink: 0;
   }
 
   .bs-footer__block {
     flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
+    padding: 8px 10px;
+    overflow: hidden;
   }
 
   /* ─────── 底部滚动告警 ─────── */
@@ -1198,8 +1341,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    min-height: 0;
+    gap: 4px;
 
     &::-webkit-scrollbar {
       width: 3px;
@@ -1207,67 +1349,63 @@
 
     &::-webkit-scrollbar-thumb {
       background: var(--bs-border-glow);
-      border-radius: 3px;
     }
-  }
 
-  .bs-scroll-list__item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 10px;
-    padding: 2px 4px;
-    border-radius: 2px;
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      padding: 2px 0;
 
-    &--high {
-      color: var(--bs-danger);
+      &--high .bs-scroll-list__level-dot {
+        background: var(--bs-danger);
+        box-shadow: 0 0 4px var(--bs-danger);
+      }
+
+      &--mid .bs-scroll-list__level-dot {
+        background: var(--bs-warn);
+      }
+
+      &--low .bs-scroll-list__level-dot {
+        background: var(--bs-success);
+      }
     }
-    &--mid {
-      color: var(--bs-warn);
+
+    &__level-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
-    &--low {
+
+    &__time {
+      color: var(--bs-text-muted);
+      flex-shrink: 0;
+    }
+
+    &__target {
       color: var(--bs-primary);
+      flex-shrink: 0;
     }
-  }
 
-  .bs-scroll-list__level-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-  }
-
-  .bs-scroll-list__time {
-    color: var(--bs-text-muted);
-    flex-shrink: 0;
-  }
-
-  .bs-scroll-list__target {
-    flex-shrink: 0;
-    font-weight: 500;
-  }
-
-  .bs-scroll-list__content {
-    flex: 1;
-    color: var(--bs-text);
+    &__content {
+      color: var(--bs-text);
+      flex: 1;
+    }
   }
 
   /* ─────── 底部今日统计 ─────── */
   .bs-today-stats {
-    display: flex;
-    gap: 4px;
     flex: 1;
+    display: flex;
     align-items: center;
+    justify-content: space-around;
+    gap: 8px;
   }
 
   .bs-today-stat {
-    flex: 1;
     text-align: center;
-    padding: 4px 2px;
-    border: 1px solid var(--bs-border);
-    border-radius: 3px;
-    background: rgba(0, 200, 255, 0.03);
 
     &__value {
       font-size: 18px;
@@ -1276,9 +1414,9 @@
     }
 
     &__label {
-      font-size: 9px;
+      font-size: 10px;
       color: var(--bs-text-muted);
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
     &__sub {
@@ -1288,24 +1426,27 @@
       &--up {
         color: var(--bs-danger);
       }
+
       &--good {
         color: var(--bs-success);
       }
+
       &--warn {
         color: var(--bs-warn);
       }
+
       &--info {
-        color: var(--bs-primary);
+        color: var(--bs-text-muted);
       }
     }
   }
 
   /* ─────── 底部系统状态 ─────── */
   .bs-sys-stats {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    flex: 1;
+    gap: 4px;
     justify-content: center;
   }
 
@@ -1313,7 +1454,7 @@
     &__header {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       font-size: 10px;
       margin-bottom: 2px;
     }
@@ -1325,7 +1466,6 @@
 
     &__value {
       color: var(--bs-text);
-      font-weight: 500;
     }
   }
 
@@ -1339,11 +1479,12 @@
       background: var(--bs-success);
       box-shadow: 0 0 4px var(--bs-success);
     }
+
     &--warn {
       background: var(--bs-warn);
-      box-shadow: 0 0 4px var(--bs-warn);
     }
-    &--err {
+
+    &--error {
       background: var(--bs-danger);
       box-shadow: 0 0 4px var(--bs-danger);
     }

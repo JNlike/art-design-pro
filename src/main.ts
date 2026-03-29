@@ -8,6 +8,7 @@ import '@styles/index.scss'                         // 样式
 import '@utils/sys/console.ts'                      // 控制台输出内容
 import { setupGlobDirectives } from './directives'
 import { setupErrorHandle } from './utils/sys/error-handle'
+import DataV from 'datav-vue3'                      // 大屏装饰组件库
 
 document.addEventListener(
   'touchstart',
@@ -22,4 +23,5 @@ setupGlobDirectives(app)
 setupErrorHandle(app)
 
 app.use(language)
+app.use(DataV)
 app.mount('#app')
