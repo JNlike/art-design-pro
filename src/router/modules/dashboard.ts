@@ -40,6 +40,19 @@ export const dashboardRoutes: AppRouteRecord = {
         icon: 'ri:bar-chart-box-line',
         keepAlive: false
       }
+    },
+    {
+      path: 'big-screen',
+      name: 'BigScreen',
+      component: '/dashboard/big-screen',
+      meta: {
+        title: 'menus.dashboard.bigScreen',
+        icon: 'ri:fullscreen-line',
+        keepAlive: false,
+        isFullPage: true,
+        newPage: true,
+        isHideTab: true
+      }
     }
   ]
 }
